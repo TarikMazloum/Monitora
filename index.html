@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Sinais Vitais - Projeto M87</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @font-face {
+            font-family: 'CONSOLA.TTF';
+            src: url('CONSOLA.TTF') format('truetype');
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'CONSOLA.TTF', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'CONSOLA.TTF', sans-serif;
+        }
+
+        main {
+            padding: 20px;
+            position: fixed;
+            z-index: 1;
+            padding-left: calc(82px + 20px);
+        }
+
+        /* Formatacoes do SideBar */
+        #sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #000000;
+            height: 100vh;
+            border-radius: 0px 0px 0px 0px;
+            position: relative;
+            transition: all .5s;
+            min-width: 100px;
+            z-index: 2;
+        }
+
+        #sidebar_content {
+            padding: 10px;
+        }
+
+        #side_items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            list-style: none;
+        }
+
+        .side-item {
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .side-item.active {
+            background-color: green;
+        }
+
+        .side-item:hover:not(.active),
+        #logout_btn:hover {
+            background-color: rgb(155, 155, 155);
+        }
+
+        .side-item a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .side-item.active a {
+            color: #ffffff;
+        }
+
+        .side-item a i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+
+
+        #logout_btn {
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-radius: 8px;
+            text-align: start;
+            cursor: pointer;
+            background-color: transparent;
+        }
+
+
+        #open_btn {
+            position: absolute;
+            top: 30px;
+            right: -30px;
+            background-color: transparent;
+            color: white;
+            border-radius: 100%;
+            width: 20px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #open_btn_icon {
+            transition: transform .3s ease;
+        }
+
+        .open-sidebar #open_btn_icon {
+            transform: rotate(180deg);
+        }
+
+        .item-description {
+            width: 0px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 20px;
+            transition: width .6s;
+            height: 0px;
+        }
+
+        #sidebar.open-sidebar {
+            min-width: 10%;
+        }
+
+        #sidebar.open-sidebar .item-description {
+            width: 150px;
+            height: auto;
+        }
+
+        #sidebar.open-sidebar .side-item a {
+            justify-content: flex-start;
+            gap: 14px;
+        }
+        /* Fim da formatacao do SideBar */
+        
+        /* Conteudo Principal */
+        .content {
+            margin-left: 50px;
+            padding: 10px;
+            flex-grow: 1;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            margin: auto;
+            padding-top: 20px;
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .info-box {
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .box {
+            width: 260px;
+            height: 260px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            margin: 0 auto;
+        }
+
+        .gabarito {
+            margin-top: 30px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .gabarito span {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .gabarito span::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .verde::before {
+            background-color: green;
+        }
+
+        .vermelho::before {
+            background-color: red;
+        }
+
+        .azul::before {
+            background-color: blue;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            border-top: 1px solid white;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        img {
+            width: 40%;
+            height: 100%;
+            margin-left: 60%;
+        }
+
+    </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js"></script>
+
+</head>
+<body>
+    <!-- Configuracoes SideBar -->
+    <nav id="sidebar">
+        <div id="sidebar_content">
+            <ul id="side_items">
+                <li class="side-item active">
+                    <a href="index.html">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span class="item-description">Dashboard</span>
+                    </a>
+                </li>
+                <li class="side-item">
+                    <a href="tabela.html">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="item-description">Tabela</span>
+                    </a>
+                </li>
+                <li class="side-item">
+                    <a href="pagina.html">
+                        <i class="fa-solid fa-file-waveform"></i>
+                        <span class="item-description">Simulação</span>
+                    </a>
+                </li>
+            </ul>
+
+
+            <button id="open_btn">
+                <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </nav>
+    <!-- Fim das Configuracoes do SideBar -->
+
+
+    <!-- Configuracoes do Conteudo Principal -->
+    <div class="content">
+        <div class="header">
+            <img src="./images/m87.png" alt="M87">
+        </div>
+        <div class="info-container">
+            <div class="info-box">
+                <h3>Temperatura (°C)</h3>
+                <div class="box" id="temperatura">--</div>
+                <div class="gabarito">
+                    <span class="verde">Sinais normais</span>
+                    <span class="vermelho">Sinais elevados</span>
+                    <span class="azul">Sinais abaixo do normal</span>
+                </div>
+            </div>
+            <div class="info-box">
+                <h3>Oxigênio (SpO2)</h3>
+                <div class="box" id="oxigenio">--</div>
+            </div>
+            <div class="info-box">
+                <h3>Batimento (Bpm)</h3>
+                <div class="box" id="batimento">--</div>
+            </div>
+        </div>
+
+        <footer>
+            Versão 1.2 - 1EMA Projeto M87
+        </footer>
+    </div>
+    
+
+
+
+
+    <script>
+
+        // Script - Funcionamento do SideBar 
+        function toggleMenu() {
+            const menu = document.getElementById("menu-content");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        }
+
+        document.getElementById('open_btn').addEventListener('click', function () {
+        document.getElementById('sidebar').classList.toggle('open-sidebar');
+        });
+
+        // Configurações do Firebase
+        const firebaseConfig = {
+        apiKey: "AIzaSyBAf9c-9w4mO51tpNpv0LU8VNmgFPw6rLc",
+        authDomain: "dados-sinais-vitais.firebaseapp.com",
+        databaseURL: "https://dados-sinais-vitais-default-rtdb.firebaseio.com",
+        projectId: "dados-sinais-vitais",
+        storageBucket: "dados-sinais-vitais.appspot.com",
+        messagingSenderId: "806366736652",
+        appId: "1:806366736652:web:7c834a58f31457eeac9929"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function updateValues() {
+            const tempRef = database.ref('dados/temperatura');
+            const oxiRef = database.ref('dados/oxigenio');
+            const bpmRef = database.ref('dados/batimento');
+
+            // Atualizar temperatura
+            tempRef.on('value', (snapshot) => {
+                const temperatura = snapshot.val();
+                document.getElementById('temperatura').textContent = temperatura.toFixed(1);
+
+                // Ajustar cores
+                if (temperatura < 35.9) {
+                    document.getElementById('temperatura').style.color = 'blue';
+                } else if (temperatura > 37.4) {
+                    document.getElementById('temperatura').style.color = 'red';
+                } else {
+                    document.getElementById('temperatura').style.color = 'green';
+                }
+            });
+
+            // Atualizar oxigênio
+            oxiRef.on('value', (snapshot) => {
+                const oxigenio = snapshot.val();
+                document.getElementById('oxigenio').textContent = oxigenio.toFixed(1);
+
+                if (oxigenio < 94.9) {
+                    document.getElementById('oxigenio').style.color = 'blue';
+                } else if (oxigenio > 100) {
+                    document.getElementById('oxigenio').style.color = 'red';
+                } else {
+                    document.getElementById('oxigenio').style.color = 'green';
+                }
+            });
+
+            // Atualizar batimentos
+            bpmRef.on('value', (snapshot) => {
+                const batimento = snapshot.val();
+                document.getElementById('batimento').textContent = batimento.toFixed(1);
+
+                if (batimento < 59) {
+                    document.getElementById('batimento').style.color = 'blue';
+                } else if (batimento > 101) {
+                    document.getElementById('batimento').style.color = 'red';
+                } else {
+                    document.getElementById('batimento').style.color = 'green';
+                }
+            });
+        }
+
+        updateValues();
+    </script>
+</body>
+</html>

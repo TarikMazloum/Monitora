@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movimento de Carrinho em 2D - Visualização de Cálculos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+      body {
+        display: flex;
+      }
+      #canvas-container {
+        margin-right: 20px;
+      }
+      #info-container {
+        font-family: Arial, sans-serif;
+        margin-top: 100px;
+      }
+      h3 {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    <div id="info-container">
+      <h3>Valores</h3>
+      <p><strong>Posição do carrinho (x, y):</strong></p>
+      <p id="posicao">x: 0, y: 0</p>
+      <p><strong>Ângulo de rotação:</strong></p>
+      <p id="anguloRotacao">0</p>
+      <p><strong>Transformações Aplicadas:</strong></p>
+      <p id="transformacao">Nenhuma</p>
+    </div>
+
+    <script>
+      let x, y; // Posição do carrinho
+      let anguloRotacao; // Ângulo de rotação
+      let velocidadeTranslacao = 2; // Velocidade de translação
+      let rastroCarro = []; // Rastro do carrinho
+
+      function setup() {
+        // Cria o canvas dentro do contêiner de canvas
+        let canvas = createCanvas(600, 600);
+        canvas.parent('canvas-container');
+        x = width / 2; // Posição inicial no centro do plano
+        y = height / 2;
+        anguloRotacao = 0; // Ângulo inicial
+      }
+
+      function draw() {
+        background(220);
+
+        // Desenhar rastro
+        drawTrail();
+
+        // Desenhar o carrinho
+        push();
+        translate(x, y); // Translação para a posição do carrinho
+        rotate(anguloRotacao); // Rotação do carrinho
+        fill(0, 102, 153);
+        rectMode(CENTER);
+        rect(0, 0, 50, 30);
+        pop();
+
+        // Atualizar informações em tempo real
+        atualizaInfor();
+
+        // Movimento do carrinho com base nas teclas
+        moverCarro();
+      }
+
+      function moverCarro() {
+        let translacaoX = 0;
+        let translacaoY = 0;
+
+        if (keyIsDown(LEFT_ARROW)) {
+          anguloRotacao -= 0.05; // Rotação no sentido anti-horário
+        }
+
+        if (keyIsDown(RIGHT_ARROW)) {
+          anguloRotacao += 0.05; // Rotação no sentido horário
+        }
+
+        if (keyIsDown(UP_ARROW)) {
+          // Translação na direção em que o carrinho está apontando
+          translacaoX = velocidadeTranslacao * cos(anguloRotacao);
+          translacaoY = velocidadeTranslacao * sin(anguloRotacao);
+          x += translacaoX;
+          y += translacaoY;
+        }
+
+        if (keyIsDown(DOWN_ARROW)) {
+          // Translação para trás
+          translacaoX = -velocidadeTranslacao * cos(anguloRotacao);
+          translacaoY = -velocidadeTranslacao * sin(anguloRotacao);
+          x -= translacaoX;
+          y -= translacaoY;
+        }
+
+        // Manter o carrinho dentro dos limites da tela
+        if (x > width) x = 0;
+        if (x < 0) x = width;
+        if (y > height) y = 0;
+        if (y < 0) y = height;
+
+        // Adicionar posição atual ao rastro
+        rastroCarro.push({ x: x, y: y });
+
+        // Limitar o tamanho do rastro
+        if (rastroCarro.length > 100) {
+          rastroCarro.shift();
+        }
+      }
+
+      // Função para desenhar o rastro
+      function drawTrail() {
+        noFill();
+        stroke(0, 150, 255);
+        strokeWeight(2);
+        beginShape();
+        for (let i = 0; i < rastroCarro.length; i++) {
+          vertex(rastroCarro[i].x, rastroCarro[i].y);
+        }
+        endShape();
+      }
+
+      function atualizaInfor() {
+        // Atualizar posição
+        let posicaoX = x.toFixed(2);
+        let posicaoY = y.toFixed(2);
+        document.getElementById('posicao').textContent = `x: ${posicaoX}, y: ${posicaoY}`;
+
+        // Atualizar ângulo de rotação em radianos
+        let angulo = anguloRotacao.toFixed(2);
+        document.getElementById('anguloRotacao').textContent = angulo;
+
+        // Exibir as transformações aplicadas
+        let transformacao = `
+          Translação: [${(velocidadeTranslacao * cos(anguloRotacao)).toFixed(2)}, ${(velocidadeTranslacao * sin(anguloRotacao)).toFixed(2)}] 
+          Rotação: ${angulo}
+        `;
+        document.getElementById('transformacao').textContent = transformacao;
+      }
+    </script>
+  </body>
+</html>

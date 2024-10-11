@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Sinais Vitais</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Estatísticas de Saúde</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Temperatura (°C)</td>
+                <td id="tempMin">--</td>
+            </tr>
+            <tr>
+                <td>BPM</td>
+                <td id="bpmMin">--</td>
+            </tr>
+            <tr>
+                <td>Oxigênio (%)</td>
+                <td id="oxiMin">--</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Configurações do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAf9c-9w4mO51tpNpv0LU8VNmgFPw6rLc",
+            authDomain: "dados-sinais-vitais.firebaseapp.com",
+            databaseURL: "https://dados-sinais-vitais-default-rtdb.firebaseio.com",
+            projectId: "dados-sinais-vitais",
+            storageBucket: "dados-sinais-vitais.appspot.com",
+            messagingSenderId: "806366736652",
+            appId: "1:806366736652:web:7c834a58f31457eeac9929"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        // Referência ao Realtime Database
+        const database = firebase.database();
+
+        function lerDados() {
+    const referencia = database.ref("dados/sinais_vitais");
+
+    // Ouvinte de mudanças de dados
+    referencia.on("value", (snapshot) => {
+        const data = snapshot.val();
+        console.log("Dados recebidos: ", data);
+
+        // Verifica se há dados
+        if (data) {
+            // Itera sobre os nós com identificadores únicos
+            const keys = Object.keys(data);  // Pega todas as chaves
+            const ultimaLeitura = data[keys[keys.length - 1]];  // Pega o último dado inserido
+            
+            // Atualizando o HTML com os valores mais recentes
+            document.getElementById("tempMin").textContent = ultimaLeitura.temperatura || '--';
+            document.getElementById("bpmMin").textContent = ultimaLeitura.bpm || '--';
+            document.getElementById("oxiMin").textContent = ultimaLeitura.spo2 || '--';
+        } else {
+            // Caso não haja dados, exibe placeholders
+            document.getElementById("tempMin").textContent = '--';
+            document.getElementById("bpmMin").textContent = '--';
+            document.getElementById("oxiMin").textContent = '--';
+        }
+    });
+}
+
+        // Iniciar leitura de dados quando a página carregar
+        window.onload = function() {
+            lerDados();
+        };
+    </script>
+</body>
+</html>

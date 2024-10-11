@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M87 - Monitoramento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @font-face {
+            font-family: 'CONSOLA.TTF';
+            src: url('CONSOLA.TTF') format('truetype'),
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'CONSOLA.TTF', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'CONSOLA.TTF', sans-serif;
+        }
+
+        main {
+            padding: 20px;
+            position: fixed;
+            z-index: 1;
+            padding-left: calc(82px + 20px);
+        }
+
+        /* Formatacoes do SideBar */
+        #sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #000000;
+            height: 100vh;
+            border-radius: 0px 0px 0px 0px;
+            position: relative;
+            transition: all .5s;
+            min-width: 100px;
+            z-index: 2;
+        }
+
+        #sidebar_content {
+            padding: 10px;
+        }
+
+
+        #side_items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            list-style: none;
+        }
+
+        .side-item {
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .side-item.active {
+            background-color: green;
+        }
+
+        .side-item:hover:not(.active),
+        #logout_btn:hover {
+            background-color: rgb(155, 155, 155);
+        }
+
+        .side-item a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .side-item.active a {
+            color: #ffffff;
+        }
+
+        .side-item a i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+
+
+        #logout_btn {
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-radius: 8px;
+            text-align: start;
+            cursor: pointer;
+            background-color: transparent;
+        }
+
+
+        #open_btn {
+            position: absolute;
+            top: 30px;
+            right: -30px;
+            background-color: transparent;
+            color: white;
+            border-radius: 100%;
+            width: 20px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #open_btn_icon {
+            transition: transform .3s ease;
+        }
+
+        .open-sidebar #open_btn_icon {
+            transform: rotate(180deg);
+        }
+
+        .item-description {
+            width: 0px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 20px;
+            transition: width .6s;
+            height: 0px;
+        }
+
+        #sidebar.open-sidebar {
+            min-width: 10%;
+        }
+
+        #sidebar.open-sidebar .item-description {
+            width: 150px;
+            height: auto;
+        }
+
+        #sidebar.open-sidebar .side-item a {
+            justify-content: flex-start;
+            gap: 14px;
+        }
+        /* Fim da formatacao do SideBar */
+
+        /* Conteudo Principal */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            width: 90%;
+        }
+
+        .content {
+            margin-left: 50px;
+            padding: 10px;
+            flex-grow: 1;
+        }
+
+        .header {
+            display: flex;
+            align-items: end;
+            width: 100%;
+            justify-content: end;
+        }
+
+        .values {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .values div {
+            text-align: center;
+            margin: 10px;
+        }
+
+        .values .box {
+            width: 260px;
+            height: 260px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 50px;
+            color: black;
+        }
+
+        .input-group {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .input-group input {
+            width: 100px;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 50px;
+            font-family: 'CONSOLA.TTF', sans-serif;
+        }
+
+        .input-group button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'CONSOLA.TTF', sans-serif;
+            background-color: #444;
+            color: white;
+            border: none;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            border-top: 1px solid white;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        img {
+            width: 40%;
+            height: 100%;
+            margin-left: 60%;
+        }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .blue {
+            background-color: blue;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <!-- Configuracoes SideBar -->
+    <nav id="sidebar">
+        <div id="sidebar_content">
+            <ul id="side_items">
+                <li class="side-item">
+                    <a href="index.html">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span class="item-description">Dashboard</span>
+                    </a>
+                </li>
+                <li class="side-item">
+                    <a href="tabela.html">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="item-description">Tabela</span>
+                    </a>
+                </li>
+                <li class="side-item active">
+                    <a href="pagina.html">
+                        <i class="fa-solid fa-file-waveform"></i>
+                        <span class="item-description">Simulação</span>
+                    </a>
+                </li>
+            </ul>
+
+
+            <button id="open_btn">
+                <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </nav>
+    <!-- Fim das Configuracoes do SideBar -->
+
+    <!-- Configuracoes do Conteudo Principal -->
+    <div class="content">
+        <div class="header">
+            <img src="./images/m87.png" alt="Logo M87">
+        </div>
+        <div class="values">
+            <div>
+                <h3>Temperatura (°C)</h3>
+                <div class="box" id="temp">--</div>
+            </div>
+            <div>
+                <h3>Oxigênio (O2)</h3>
+                <div class="box" id="oxigenio">--</div>
+            </div>
+            <div>
+                <h3>Batimento (Bpm)</h3>
+                <div class="box" id="batimento">--</div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div><div class="dot green"></div> Sinais normais</div>
+            <div><div class="dot red"></div> Sinais elevados</div>
+            <div><div class="dot blue"></div> Sinais abaixo do normal</div>
+        </div>
+
+        <div class="input-group">
+            <input type="number" id="tempInput" placeholder="Temperatura">
+            <button onclick="updateValue('temp', 'tempInput', 'temp')">Atualizar Temperatura</button>
+        </div>
+        <div class="input-group">
+            <input type="number" id="oxigenioInput" placeholder="Oxigênio">
+            <button onclick="updateValue('oxigenio', 'oxigenioInput', 'oxigenio')">Atualizar Oxigênio</button>
+        </div>
+        <div class="input-group">
+            <input type="number" id="batimentoInput" placeholder="Batimento">
+            <button onclick="updateValue('batimento', 'batimentoInput', 'batimento')">Atualizar Batimento</button>
+        </div>
+        <footer>
+            Versão 1.2 - 1EMA Projeto M87
+        </footer>
+    </div>
+        
+
+    <script>
+
+        // Script - Funcionamento do SideBar 
+        function toggleMenu() {
+            const menu = document.getElementById("menu-content");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        }
+
+        document.getElementById('open_btn').addEventListener('click', function () {
+        document.getElementById('sidebar').classList.toggle('open-sidebar');
+        });
+
+        // Script - Condicoes de alerta
+        function updateValue(elementId, inputId, type) {
+            const inputValue = parseFloat(document.getElementById(inputId).value);
+            const element = document.getElementById(elementId);
+
+            if (!isNaN(inputValue)) {
+                element.innerText = inputValue;
+
+                switch (type) {
+                    case 'temp':
+                        if (inputValue < 35.9) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 37.4) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+
+                    case 'oxigenio':
+                        if (inputValue < 94.9) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 101) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+
+                    case 'batimento':
+                        if (inputValue < 59) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 101) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+                }
+            } else {
+                alert('Por favor, insira um valor válido.');
+            }
+        }
+    </script>
+</body>
+</html>
